@@ -3,8 +3,6 @@ import { getSkillSheet } from "@/app/actions/skillSheet";
 import { requireUser } from "@/lib/auth";
 import { Header } from "@/components/Header";
 import { SkillSheetEditor } from "@/components/SkillSheetEditor";
-import { CopyButton } from "@/components/CopyButton";
-import { PdfExportButton } from "@/components/PdfExportButton";
 import type { StructuredSkillSheet } from "@/lib/validations";
 
 type PageProps = {
@@ -21,10 +19,6 @@ export default async function SkillSheetResultPage({ params }: PageProps) {
   }
 
   const structured = record.structuredDataJson as StructuredSkillSheet;
-  const exportText = [
-    record.aiSummary ?? "",
-    JSON.stringify(structured, null, 2),
-  ].join("\n\n");
 
   return (
     <>
@@ -34,10 +28,6 @@ export default async function SkillSheetResultPage({ params }: PageProps) {
           <div>
             <h1 className="text-3xl font-bold">スキルシート読み取り結果</h1>
             <p className="mt-2 text-zinc-600">{record.fileName}</p>
-          </div>
-          <div className="flex gap-2">
-            <CopyButton text={exportText} />
-            <PdfExportButton title="スキルシート結果" content={exportText} />
           </div>
         </div>
 
