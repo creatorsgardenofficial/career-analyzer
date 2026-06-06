@@ -10,7 +10,7 @@ export function Header({ userName }: HeaderProps) {
     <header className="border-b border-zinc-200 bg-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <Link href="/dashboard" className="text-lg font-bold text-blue-700">
-          SES Career Analyzer
+          Career Analyzer
         </Link>
         <nav className="flex items-center gap-4 text-sm">
           <Link href="/dashboard" className="hover:text-blue-700">

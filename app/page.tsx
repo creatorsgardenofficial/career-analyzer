@@ -11,7 +11,7 @@ export default async function HomePage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center px-4 py-16 text-center">
       <h1 className="mb-4 text-4xl font-bold text-blue-700">
-        SES Career Analyzer
+        Career Analyzer
       </h1>
       <p className="mb-8 max-w-2xl text-lg text-zinc-600">
         SESエンジニア向けの個人分析・スキルシート分析・将来キャリア分析・案件面談対策を支援するWebアプリです。

@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SES Career Analyzer",
-  description: "SESエンジニア向け個人分析・案件対策Webアプリ",
+  title: "Career Analyzer",
+  description: "個人分析・案件対策Webアプリ",
 };
 
 export default function RootLayout({
