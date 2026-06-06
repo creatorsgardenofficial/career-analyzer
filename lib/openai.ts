@@ -188,8 +188,13 @@ export async function generateFutureAnalysis(params: {
   skillSheet?: StructuredSkillSheet | null;
 }): Promise<string> {
   const system = `あなたはSESエンジニア向けのキャリアコーチです。
-個人分析結果とスキルシートをもとに、1年後・2年後・3年後の成長ロードマップを作成してください。
-現実的で実行可能なアドバイスにしてください。`;
+個人分析結果とスキルシートを必ず踏まえて、1年後・2年後・3年後の成長ロードマップを作成してください。
+現実的で実行可能なアドバイスにしてください。
+条件:
+- 個人分析の強み・伸ばしたい項目を、学習方針や仕事の進め方に反映する
+- スキルシートに記載された経験年数、使用技術、担当工程、プロジェクト経験を根拠として扱う
+- スキルシートにない経験を経験済みのように書かない
+- 個人分析またはスキルシートが未登録の場合は、未登録であることを前提に、入力内容から分かる範囲で提案する`;
 
   const user = `なりたいエンジニア像: ${params.input.targetEngineerType}
 興味技術: ${params.input.interestedTechnologies ?? ""}
@@ -201,9 +206,9 @@ export async function generateFutureAnalysis(params: {
 週あたりの学習時間: ${params.input.studyTime ?? ""}
 補足: ${params.input.notes ?? ""}
 
-個人分析スコア: ${JSON.stringify(params.categoryScores)}
+個人分析の回答傾向: ${JSON.stringify(params.categoryScores)}
 強み: ${params.strengths.join("、")}
-弱み: ${params.weaknesses.join("、")}
+伸ばしたい項目: ${params.weaknesses.join("、")}
 スキルシート: ${JSON.stringify(params.skillSheet ?? {})}
 
 以下の見出しで日本語で回答:
@@ -234,11 +239,14 @@ export async function generateProjectPreparation(params: {
 以下の情報をもとに、案件面談で使える自己紹介文、想定質問10件、回答例10件、逆質問5件を作成してください。
 条件:
 - 経歴を盛りすぎない
-- 弱みを正直に扱いつつ前向きな表現に変換する
+- 個人分析の強み・伸ばしたい項目を、自己紹介や回答例の表現に反映する
+- スキルシートの実務経験、使用技術、担当工程、プロジェクト内容を回答の根拠にする
+- 弱みや不安点を正直に扱いつつ前向きな表現に変換する
 - 案件概要に合う内容にする
 - 面談でそのまま話せる自然な文章にする
 - 回答は1問あたり30秒〜1分程度
 - 経験していないことを経験済みのように書かない
+- スキルシートにない技術は「経験済み」ではなく「学習中」「キャッチアップ可能」などの表現にする
 
 必ず有効なJSONのみを返してください。`;
 
@@ -253,9 +261,9 @@ export async function generateProjectPreparation(params: {
 面談予定日: ${params.input.interviewDate ?? ""}
 不安点: ${params.input.concerns ?? ""}
 
-個人分析: ${JSON.stringify(params.categoryScores)}
+個人分析の回答傾向: ${JSON.stringify(params.categoryScores)}
 強み: ${params.strengths.join("、")}
-弱み: ${params.weaknesses.join("、")}
+伸ばしたい項目: ${params.weaknesses.join("、")}
 スキルシート: ${JSON.stringify(params.skillSheet ?? {})}
 
 JSON形式:
