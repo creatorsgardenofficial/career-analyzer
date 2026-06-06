@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  analysisResults      AnalysisResult[]
+  skillSheets          SkillSheet[]
+  futureAnalyses       FutureAnalysis[]
+  projectPreparations  ProjectPreparation[]
+  passwordResetTokens  PasswordResetToken[]
+}
+
+model Question {
+  id           String @id @default(cuid())
+  category     String
+  questionText String
+  displayOrder Int    @unique
+
+  @@index([category])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+}
+
+model AnalysisResult {
+  id                 String   @id @default(cuid())
+  userId             String
+  title              String?
+  answersJson        Json
+  categoryScoresJson Json
+  strengthsJson      Json?
+  weaknessesJson     Json?
+  aiComment          String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SkillSheet {
+  id                 String   @id @default(cuid())
+  userId             String
+  title              String?
+  fileName           String
+  filePath           String?
+  extractedText      String
+  structuredDataJson Json
+  aiSummary          String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model FutureAnalysis {
+  id                 String   @id @default(cuid())
+  userId             String
+  title              String?
+  targetEngineerType String
+  inputJson          Json
+  resultText         String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ProjectPreparation {
+  id                   String   @id @default(cuid())
+  userId               String
+  title                String?
+  projectName          String?
+  interviewDate        String?
+  projectDescription   String
+  selfIntroduction     String
+  questionsJson        Json
+  reverseQuestionsJson Json
+  fullResultText       String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
