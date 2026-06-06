@@ -2,6 +2,8 @@ import OpenAI from "openai";
 import type { CategoryKey } from "@/lib/analysis";
 import { CATEGORY_LABELS } from "@/lib/analysis";
 import type {
+  ProjectQuestionItem,
+  ReverseQuestionItem,
   StructuredSkillSheet,
   futureAnalysisInputSchema,
   projectPreparationInputSchema,
@@ -10,6 +12,12 @@ import type { z } from "zod";
 
 type FutureInput = z.infer<typeof futureAnalysisInputSchema>;
 type ProjectInput = z.infer<typeof projectPreparationInputSchema>;
+
+const COMMON_AI_RULES = `- 経験していないことを経験済みのように書かない
+- スキルシートにない技術は「学習中」「キャッチアップ可能」などの表現にする
+- 個人分析の強み・伸ばしたい項目を出力に反映する
+- 抽象論ではなく、実務で使える具体例を書く
+- 人を点数化・序列化する表現は避ける`;
 
 function hasOpenAiKey(): boolean {
   return Boolean(process.env.OPENAI_API_KEY?.trim());
@@ -52,6 +60,29 @@ async function chatCompletion(system: string, user: string): Promise<string> {
   return response.choices[0]?.message?.content?.trim() ?? "";
 }
 
+function buildAnalysisContext(params: {
+  categoryScores: Record<string, number>;
+  strengths: string[];
+  weaknesses: string[];
+  skillSheet?: StructuredSkillSheet | null;
+}) {
+  const scoreText = Object.entries(params.categoryScores)
+    .map(([key, score]) => {
+      const label = CATEGORY_LABELS[key as CategoryKey] ?? key;
+      return `${label}: ${score}`;
+    })
+    .join("\n");
+
+  return `個人分析の回答傾向:
+${scoreText || "未登録"}
+
+強み: ${params.strengths.join("、") || "未登録"}
+伸ばしたい項目: ${params.weaknesses.join("、") || "未登録"}
+
+スキルシート:
+${JSON.stringify(params.skillSheet ?? {}, null, 2)}`;
+}
+
 export async function generatePersonalAnalysisComment(params: {
   categoryScores: Record<CategoryKey, number>;
   strengths: string[];
@@ -62,17 +93,14 @@ export async function generatePersonalAnalysisComment(params: {
 以下の回答傾向とスキルシート情報をもとに、ユーザーが自己理解を深めるための分析コメントを作成してください。
 条件:
 - 厳しすぎず、現実的に書く
-- 人を点数化・序列化する表現は避ける
 - 「向いている案件」「向いていない案件」「避けた方がよい案件」は書かない
 - 「注意点」という見出しや警告調の表現は使わない
 - 弱みは否定ではなく、伸ばしたい課題として書く
-- 抽象論ではなく具体的に書く
-- 経験していないことを経験済みのように書かない
-- 回答傾向から読み取れる「仕事で出やすい行動」「周囲から見えやすい印象」「成長の打ち手」まで踏み込む
 - 1つの見出しにつき、2〜4個の箇条書きまたは短い段落で詳しく書く
 - 全体で900〜1400字程度にする
 - Markdown形式で、見出しは必ず「## 」から始める
-- 箇条書きは「- 」を使う`;
+- 箇条書きは「- 」を使う
+${COMMON_AI_RULES}`;
 
   const scoreText = Object.entries(params.categoryScores)
     .map(([key, score]) => `${CATEGORY_LABELS[key as CategoryKey]}: ${score}`)
@@ -91,17 +119,20 @@ ${params.skillSheetSummary ?? "未登録"}
 ## 全体像
 回答傾向から見える仕事への向き合い方を、本人が納得しやすい言葉で説明してください。
 
+## 周囲から見えやすい印象
+周囲の同僚や上司から見たときの印象を、肯定的かつ具体的に説明してください。
+
 ## 強みとして表れた行動
 強みが実務でどのような行動として出やすいか、具体例を交えて説明してください。
 
 ## 伸ばしたいテーマ
 弱みを否定せず、伸ばすと仕事が進めやすくなるテーマとして説明してください。
 
-## 明日から試せる行動
-日々の業務や学習で実行しやすい行動を、具体的に3〜5個提案してください。
+## 改善の第一歩
+明日から試せる小さな行動を3〜5個提案してください。
 
-## 振り返り質問
-本人が自己理解を深めるための質問を3〜5個挙げてください。`;
+## 面談・振り返りで使える言語化
+面談や自己振り返りでそのまま使える言い回しを2〜3個提案してください。`;
 
   return chatCompletion(system, user);
 }
@@ -193,8 +224,10 @@ export async function generateFutureAnalysis(params: {
 条件:
 - 個人分析の強み・伸ばしたい項目を、学習方針や仕事の進め方に反映する
 - スキルシートに記載された経験年数、使用技術、担当工程、プロジェクト経験を根拠として扱う
-- スキルシートにない経験を経験済みのように書かない
-- 個人分析またはスキルシートが未登録の場合は、未登録であることを前提に、入力内容から分かる範囲で提案する`;
+- 個人分析またはスキルシートが未登録の場合は、未登録であることを前提に、入力内容から分かる範囲で提案する
+- 各見出しは2〜4個の箇条書きで具体的に書く
+- Markdown形式で、見出しは必ず「## 」から始める
+${COMMON_AI_RULES}`;
 
   const user = `なりたいエンジニア像: ${params.input.targetEngineerType}
 興味技術: ${params.input.interestedTechnologies ?? ""}
@@ -206,16 +239,15 @@ export async function generateFutureAnalysis(params: {
 週あたりの学習時間: ${params.input.studyTime ?? ""}
 補足: ${params.input.notes ?? ""}
 
-個人分析の回答傾向: ${JSON.stringify(params.categoryScores)}
-強み: ${params.strengths.join("、")}
-伸ばしたい項目: ${params.weaknesses.join("、")}
-スキルシート: ${JSON.stringify(params.skillSheet ?? {})}
+${buildAnalysisContext(params)}
 
 以下の見出しで日本語で回答:
+## 現在のスキル棚卸し
 ## 1年後
 ## 2年後
 ## 3年後
 ## 学習優先順位
+## スキルシートに追記できる成果物例
 ## おすすめ案件傾向`;
 
   return chatCompletion(system, user);
@@ -223,8 +255,8 @@ export async function generateFutureAnalysis(params: {
 
 export type ProjectPreparationResult = {
   selfIntroduction: string;
-  questions: Array<{ question: string; answer: string }>;
-  reverseQuestions: string[];
+  questions: ProjectQuestionItem[];
+  reverseQuestions: ReverseQuestionItem[];
   fullResultText: string;
 };
 
@@ -241,12 +273,12 @@ export async function generateProjectPreparation(params: {
 - 経歴を盛りすぎない
 - 個人分析の強み・伸ばしたい項目を、自己紹介や回答例の表現に反映する
 - スキルシートの実務経験、使用技術、担当工程、プロジェクト内容を回答の根拠にする
+- 案件概要・必須スキルと本人経験の接点を回答に明示する
 - 弱みや不安点を正直に扱いつつ前向きな表現に変換する
-- 案件概要に合う内容にする
 - 面談でそのまま話せる自然な文章にする
 - 回答は1問あたり30秒〜1分程度
-- 経験していないことを経験済みのように書かない
-- スキルシートにない技術は「経験済み」ではなく「学習中」「キャッチアップ可能」などの表現にする
+- 想定質問は必ず10件、逆質問は必ず5件
+${COMMON_AI_RULES}
 
 必ず有効なJSONのみを返してください。`;
 
@@ -261,34 +293,59 @@ export async function generateProjectPreparation(params: {
 面談予定日: ${params.input.interviewDate ?? ""}
 不安点: ${params.input.concerns ?? ""}
 
-個人分析の回答傾向: ${JSON.stringify(params.categoryScores)}
-強み: ${params.strengths.join("、")}
-伸ばしたい項目: ${params.weaknesses.join("、")}
-スキルシート: ${JSON.stringify(params.skillSheet ?? {})}
+${buildAnalysisContext(params)}
 
 JSON形式:
 {
-  "selfIntroduction": "",
-  "questions": [{ "question": "", "answer": "" }],
-  "reverseQuestions": [""]
+  "selfIntroduction30": "30秒版の自己紹介文",
+  "selfIntroduction60": "60秒版の自己紹介文",
+  "questions": [
+    {
+      "question": "",
+      "answer": "",
+      "intent": "この回答で伝えたいこと",
+      "avoid": "避けたい言い方"
+    }
+  ],
+  "reverseQuestions": [
+    {
+      "question": "",
+      "purpose": "この質問の目的"
+    }
+  ]
 }`;
 
   if (shouldUseMock()) {
-    const questions = Array.from({ length: 10 }, (_, i) => ({
+    const questions: ProjectQuestionItem[] = Array.from({ length: 10 }, (_, i) => ({
       question: `想定質問${i + 1}: これまでの開発経験を教えてください`,
       answer: `回答例${i + 1}: これまでWebアプリ開発を中心に担当してきました。`,
+      intent: "実務経験の幅と継続性を伝える",
+      avoid: "未経験の技術を経験済みのように言わない",
     }));
-    const reverseQuestions = Array.from(
+    const reverseQuestions: ReverseQuestionItem[] = Array.from(
       { length: 5 },
-      (_, i) => `逆質問${i + 1}: 参画後の最初の担当業務を教えてください`,
+      (_, i) => ({
+        question: `逆質問${i + 1}: 参画後の最初の担当業務を教えてください`,
+        purpose: "初期タスクと立ち上がり期間を確認する",
+      }),
     );
-    const selfIntroduction =
-      "はじめまして。これまでSES案件でWebアプリ開発を担当してきました。";
+    const selfIntroduction = JSON.stringify({
+      short: "はじめまして。Webアプリ開発を中心に3年ほど経験しています。",
+      standard:
+        "はじめまして。SES案件でWebアプリ開発を中心に担当してきました。要件整理から実装、テストまで一連の工程に携わっています。",
+    });
     return {
       selfIntroduction,
       questions,
       reverseQuestions,
-      fullResultText: `${selfIntroduction}\n\n${questions.map((q) => `${q.question}\n${q.answer}`).join("\n\n")}`,
+      fullResultText: buildProjectFullResultText({
+        selfIntroduction30:
+          "はじめまして。Webアプリ開発を中心に3年ほど経験しています。",
+        selfIntroduction60:
+          "はじめまして。SES案件でWebアプリ開発を中心に担当してきました。",
+        questions,
+        reverseQuestions,
+      }),
     };
   }
 
@@ -299,26 +356,54 @@ JSON形式:
   }
 
   const parsed = JSON.parse(jsonMatch[0]) as {
-    selfIntroduction: string;
-    questions: Array<{ question: string; answer: string }>;
-    reverseQuestions: string[];
+    selfIntroduction30: string;
+    selfIntroduction60: string;
+    questions: ProjectQuestionItem[];
+    reverseQuestions: ReverseQuestionItem[];
   };
 
-  const fullResultText = [
-    parsed.selfIntroduction,
-    "",
-    "## 想定質問と回答例",
-    ...parsed.questions.flatMap((q) => [`Q: ${q.question}`, `A: ${q.answer}`, ""]),
-    "## 逆質問",
-    ...parsed.reverseQuestions.map((q, i) => `${i + 1}. ${q}`),
-  ].join("\n");
+  const selfIntroduction = JSON.stringify({
+    short: parsed.selfIntroduction30,
+    standard: parsed.selfIntroduction60,
+  });
 
   return {
-    selfIntroduction: parsed.selfIntroduction,
+    selfIntroduction,
     questions: parsed.questions,
     reverseQuestions: parsed.reverseQuestions,
-    fullResultText,
+    fullResultText: buildProjectFullResultText(parsed),
   };
+}
+
+function buildProjectFullResultText(params: {
+  selfIntroduction30: string;
+  selfIntroduction60: string;
+  questions: ProjectQuestionItem[];
+  reverseQuestions: ReverseQuestionItem[];
+}) {
+  return [
+    "## 自己紹介文（30秒版）",
+    params.selfIntroduction30,
+    "",
+    "## 自己紹介文（60秒版）",
+    params.selfIntroduction60,
+    "",
+    "## 想定質問と回答例",
+    ...params.questions.flatMap((q, index) => [
+      `${index + 1}. ${q.question}`,
+      `回答例: ${q.answer}`,
+      q.intent ? `回答の狙い: ${q.intent}` : "",
+      q.avoid ? `避けたい言い方: ${q.avoid}` : "",
+      "",
+    ]),
+    "## 逆質問",
+    ...params.reverseQuestions.map(
+      (q, index) =>
+        `${index + 1}. ${q.question}${q.purpose ? `\n目的: ${q.purpose}` : ""}`,
+    ),
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 export const structureSkillSheet = structureSkillSheetText;

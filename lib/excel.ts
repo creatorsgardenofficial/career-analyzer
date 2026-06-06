@@ -25,7 +25,7 @@ export function extractTextFromExcel(buffer: Buffer): string {
     }
   }
 
-  return lines.join("\n");
+  return lines.join("\n").slice(0, MAX_EXTRACTED_TEXT_LENGTH);
 }
 
 export function isAllowedExcelFile(fileName: string): boolean {
@@ -33,4 +33,15 @@ export function isAllowedExcelFile(fileName: string): boolean {
   return lower.endsWith(".xlsx") || lower.endsWith(".xls");
 }
 
+export const ALLOWED_EXCEL_MIME_TYPES = new Set([
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-excel",
+  "application/octet-stream",
+]);
+
+export function isAllowedExcelMimeType(mimeType: string): boolean {
+  return ALLOWED_EXCEL_MIME_TYPES.has(mimeType);
+}
+
 export const MAX_UPLOAD_SIZE = 5 * 1024 * 1024;
+export const MAX_EXTRACTED_TEXT_LENGTH = 12000;

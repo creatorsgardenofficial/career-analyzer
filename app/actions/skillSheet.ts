@@ -2,6 +2,7 @@
 
 import type { Prisma } from "@prisma/client";
 import { requireUser } from "@/lib/auth";
+import { getSafeErrorMessage } from "@/lib/errors";
 import { prisma } from "@/lib/prisma";
 import { skillSheetUpdateSchema } from "@/lib/validations";
 
@@ -55,7 +56,7 @@ export async function updateSkillSheetAction(
     return { success: "保存しました" };
   } catch (error) {
     console.error(error);
-    return { error: "スキルシートの更新に失敗しました" };
+    return { error: getSafeErrorMessage(error, "スキルシートの更新に失敗しました") };
   }
 }
 

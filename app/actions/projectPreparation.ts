@@ -4,8 +4,10 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
 import type { CategoryKey } from "@/lib/analysis";
 import { requireUser } from "@/lib/auth";
+import { getSafeErrorMessage } from "@/lib/errors";
 import { generateProjectPreparation } from "@/lib/openai";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, rateLimitMessage } from "@/lib/rate-limit";
 import {
   projectPreparationInputSchema,
   type StructuredSkillSheet,
@@ -21,6 +23,15 @@ export async function createProjectPreparationAction(
 ): Promise<ProjectPreparationActionState> {
   try {
     const user = await requireUser();
+
+    const rateLimit = checkRateLimit({
+      key: `project-preparation:${user.id}`,
+      limit: 10,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (!rateLimit.allowed) {
+      return { error: rateLimitMessage(rateLimit.retryAfterMs) };
+    }
 
     const parsed = projectPreparationInputSchema.safeParse({
       projectName: formData.get("projectName") || undefined,
@@ -85,10 +96,7 @@ export async function createProjectPreparationAction(
     }
     console.error(error);
     return {
-      error:
-        error instanceof Error
-          ? error.message
-          : "案件対策の生成中にエラーが発生しました",
+      error: getSafeErrorMessage(error, "案件対策の生成中にエラーが発生しました"),
     };
   }
 }

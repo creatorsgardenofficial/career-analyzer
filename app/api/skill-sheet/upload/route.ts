@@ -1,18 +1,33 @@
 import { NextResponse } from "next/server";
-import { getSession } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
+import { getSafeErrorMessage } from "@/lib/errors";
 import {
+  MAX_UPLOAD_SIZE,
   extractTextFromExcel,
   isAllowedExcelFile,
-  MAX_UPLOAD_SIZE,
+  isAllowedExcelMimeType,
 } from "@/lib/excel";
 import { structureSkillSheetText } from "@/lib/openai";
+import { prisma } from "@/lib/prisma";
+import { checkRateLimit, rateLimitMessage } from "@/lib/rate-limit";
+import { getSession } from "@/lib/session";
 
 export async function POST(request: Request) {
   try {
     const session = await getSession();
     if (!session.user) {
       return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
+    }
+
+    const rateLimit = checkRateLimit({
+      key: `skill-sheet-upload:${session.user.id}`,
+      limit: 10,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: rateLimitMessage(rateLimit.retryAfterMs) },
+        { status: 429 },
+      );
     }
 
     const formData = await request.formData();
@@ -28,6 +43,13 @@ export async function POST(request: Request) {
     if (!isAllowedExcelFile(file.name)) {
       return NextResponse.json(
         { error: ".xlsx または .xls 形式のファイルをアップロードしてください" },
+        { status: 400 },
+      );
+    }
+
+    if (file.type && !isAllowedExcelMimeType(file.type)) {
+      return NextResponse.json(
+        { error: "許可されていないファイル形式です" },
         { status: 400 },
       );
     }
@@ -67,10 +89,10 @@ export async function POST(request: Request) {
     console.error(error);
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : "スキルシートのアップロードに失敗しました",
+        error: getSafeErrorMessage(
+          error,
+          "スキルシートのアップロードに失敗しました",
+        ),
       },
       { status: 500 },
     );

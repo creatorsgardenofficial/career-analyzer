@@ -4,8 +4,10 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
 import type { CategoryKey } from "@/lib/analysis";
 import { requireUser } from "@/lib/auth";
+import { getSafeErrorMessage } from "@/lib/errors";
 import { generateFutureAnalysis } from "@/lib/openai";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, rateLimitMessage } from "@/lib/rate-limit";
 import {
   futureAnalysisInputSchema,
   type StructuredSkillSheet,
@@ -21,6 +23,15 @@ export async function createFutureAnalysisAction(
 ): Promise<FutureAnalysisActionState> {
   try {
     const user = await requireUser();
+
+    const rateLimit = checkRateLimit({
+      key: `future-analysis:${user.id}`,
+      limit: 10,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (!rateLimit.allowed) {
+      return { error: rateLimitMessage(rateLimit.retryAfterMs) };
+    }
 
     const parsed = futureAnalysisInputSchema.safeParse({
       targetEngineerType: formData.get("targetEngineerType"),
@@ -80,10 +91,7 @@ export async function createFutureAnalysisAction(
     }
     console.error(error);
     return {
-      error:
-        error instanceof Error
-          ? error.message
-          : "将来分析の生成中にエラーが発生しました",
+      error: getSafeErrorMessage(error, "将来分析の生成中にエラーが発生しました"),
     };
   }
 }

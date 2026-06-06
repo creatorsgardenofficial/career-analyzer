@@ -6,6 +6,10 @@ import { Header } from "@/components/Header";
 import { AnalysisChart } from "@/components/AnalysisChart";
 import { CopyButton } from "@/components/CopyButton";
 import { PdfExportButton } from "@/components/PdfExportButton";
+import {
+  StructuredResultView,
+  parseStructuredText,
+} from "@/components/StructuredResultView";
 import { extractCategoryScores } from "@/lib/analysis";
 
 type PageProps = {
@@ -26,7 +30,7 @@ export default async function AnalysisResultPage({ params }: PageProps) {
   const strengths = (result.strengthsJson as string[]) ?? [];
   const weaknesses = (result.weaknessesJson as string[]) ?? [];
   const displayComment = removeProjectSections(result.aiComment);
-  const commentSections = parseAnalysisComment(displayComment);
+  const commentSections = parseStructuredText(displayComment);
 
   return (
     <>
@@ -76,7 +80,7 @@ export default async function AnalysisResultPage({ params }: PageProps) {
 
         <div className="mt-8 rounded-lg border border-zinc-200 bg-white p-6">
           <h2 className="mb-4 text-xl font-semibold">AI分析コメント</h2>
-          <AnalysisCommentView sections={commentSections} />
+          <StructuredResultView sections={commentSections} />
         </div>
       </main>
     </>
@@ -90,74 +94,6 @@ function removeProjectSections(comment: string) {
       "",
     )
     .trim();
-}
-
-type AnalysisCommentSection = {
-  title: string;
-  lines: string[];
-};
-
-function parseAnalysisComment(comment: string): AnalysisCommentSection[] {
-  const sections: AnalysisCommentSection[] = [];
-  let current: AnalysisCommentSection | null = null;
-
-  for (const rawLine of comment.split("\n")) {
-    const line = rawLine.trim();
-    if (!line) continue;
-
-    const heading = line.match(/^##\s+(.+)$/);
-    if (heading) {
-      current = { title: heading[1], lines: [] };
-      sections.push(current);
-      continue;
-    }
-
-    if (!current) {
-      current = { title: "分析コメント", lines: [] };
-      sections.push(current);
-    }
-    current.lines.push(line);
-  }
-
-  return sections.length > 0
-    ? sections
-    : [{ title: "分析コメント", lines: ["分析コメントはまだありません。"] }];
-}
-
-function AnalysisCommentView({
-  sections,
-}: {
-  sections: AnalysisCommentSection[];
-}) {
-  return (
-    <div className="space-y-4">
-      {sections.map((section) => (
-        <section
-          key={section.title}
-          className="rounded-lg border border-zinc-100 bg-zinc-50 p-4"
-        >
-          <h3 className="mb-3 text-base font-semibold text-zinc-900">
-            {section.title}
-          </h3>
-          <div className="space-y-2 text-sm leading-7 text-zinc-700">
-            {section.lines.map((line, index) => {
-              const bullet = line.match(/^[-・]\s*(.+)$/);
-              if (bullet) {
-                return (
-                  <div key={`${section.title}-${index}`} className="flex gap-2">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600" />
-                    <p>{bullet[1]}</p>
-                  </div>
-                );
-              }
-
-              return <p key={`${section.title}-${index}`}>{line}</p>;
-            })}
-          </div>
-        </section>
-      ))}
-    </div>
-  );
 }
 
 function InfoCard({

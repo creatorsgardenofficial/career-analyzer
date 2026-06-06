@@ -7,9 +7,11 @@ import {
   getStrengthsAndWeaknesses,
 } from "@/lib/analysis";
 import { requireUser } from "@/lib/auth";
+import { getSafeErrorMessage } from "@/lib/errors";
 import { generatePersonalAnalysisComment } from "@/lib/openai";
 import { prisma } from "@/lib/prisma";
 import { getQuestionsFromDb } from "@/lib/questions";
+import { checkRateLimit, rateLimitMessage } from "@/lib/rate-limit";
 import { analysisAnswersSchema } from "@/lib/validations";
 
 export type AnalysisActionState = {
@@ -22,6 +24,16 @@ export async function createAnalysisAction(
 ): Promise<AnalysisActionState> {
   try {
     const user = await requireUser();
+
+    const rateLimit = checkRateLimit({
+      key: `analysis:${user.id}`,
+      limit: 10,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (!rateLimit.allowed) {
+      return { error: rateLimitMessage(rateLimit.retryAfterMs) };
+    }
+
     const answersRaw = formData.get("answers");
 
     if (typeof answersRaw !== "string") {
@@ -85,10 +97,7 @@ export async function createAnalysisAction(
     }
     console.error(error);
     return {
-      error:
-        error instanceof Error
-          ? error.message
-          : "分析の保存中にエラーが発生しました",
+      error: getSafeErrorMessage(error, "分析の保存中にエラーが発生しました"),
     };
   }
 }
