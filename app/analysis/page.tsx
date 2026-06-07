@@ -10,9 +10,9 @@ export default async function AnalysisPage() {
   return (
     <>
       <Header userName={user.name} />
-      <main className="mx-auto max-w-3xl px-4 py-8">
-        <h1 className="mb-2 text-3xl font-bold">個人分析</h1>
-        <p className="mb-8 text-zinc-600">
+      <main className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
+        <h1 className="mb-2 text-2xl font-bold sm:text-3xl">個人分析</h1>
+        <p className="mb-6 text-sm leading-7 text-zinc-600 sm:mb-8 sm:text-base">
           全{questions.length}問の5段階評価に回答してください。
         </p>
 

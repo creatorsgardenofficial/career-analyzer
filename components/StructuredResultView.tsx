@@ -40,12 +40,12 @@ export function StructuredResultView({
       {sections.map((section) => (
         <section
           key={section.title}
-          className="rounded-lg border border-zinc-100 bg-zinc-50 p-4"
+          className="rounded-lg border border-zinc-100 bg-zinc-50 p-3 sm:p-4"
         >
-          <h2 className="mb-3 text-lg font-semibold text-zinc-900">
+          <h2 className="mb-3 break-words text-base font-semibold text-zinc-900 sm:text-lg">
             {section.title}
           </h2>
-          <div className="space-y-2 text-sm leading-7 text-zinc-700">
+          <div className="space-y-2 break-words text-sm leading-7 text-zinc-700">
             {section.lines.map((line, index) => {
               const bullet = line.match(/^[-・]\s*(.+)$/);
               const numbered = line.match(/^(\d+)[.)]\s*(.+)$/);

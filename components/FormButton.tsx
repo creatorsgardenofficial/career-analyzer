@@ -17,7 +17,7 @@ export function FormButton({
     <button
       type="submit"
       disabled={pending || disabled}
-      className={`rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
+      className={`w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto ${className}`}
     >
       {pending ? "処理中..." : children}
     </button>

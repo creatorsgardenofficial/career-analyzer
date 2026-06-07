@@ -89,7 +89,7 @@ export function PdfExportButton({
       type="button"
       onClick={handleExport}
       disabled={isExporting}
-      className="rounded-md bg-zinc-800 px-3 py-1.5 text-sm text-white hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-60"
+      className="w-full rounded-md bg-zinc-800 px-3 py-1.5 text-sm text-white hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
     >
       {isExporting ? "PDF生成中..." : "PDF出力"}
     </button>

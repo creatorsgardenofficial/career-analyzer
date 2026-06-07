@@ -16,7 +16,10 @@ export function ProjectPreparationForm() {
   );
 
   return (
-    <form action={formAction} className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6">
+    <form
+      action={formAction}
+      className="space-y-4 rounded-lg border border-zinc-200 bg-white p-4 sm:p-6"
+    >
       <Field label="案件名" name="projectName" />
       <div>
         <label htmlFor="projectDescription" className="mb-1 block text-sm font-medium">

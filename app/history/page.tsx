@@ -60,8 +60,8 @@ export default async function HistoryPage() {
   return (
     <>
       <Header userName={user.name} />
-      <main className="mx-auto max-w-6xl px-4 py-8">
-        <h1 className="mb-8 text-3xl font-bold">履歴一覧</h1>
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+        <h1 className="mb-6 text-2xl font-bold sm:mb-8 sm:text-3xl">履歴一覧</h1>
         <HistoryList items={items} />
       </main>
     </>

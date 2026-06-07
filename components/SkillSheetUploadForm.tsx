@@ -47,20 +47,20 @@ export function SkillSheetUploadForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6"
+      className="space-y-4 rounded-lg border border-zinc-200 bg-white p-4 sm:p-6"
     >
       <div>
         <label htmlFor="file" className="mb-2 block text-sm font-medium">
           Excelスキルシート (.xlsx / .xls)
         </label>
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <label
             htmlFor="file"
-            className="inline-flex cursor-pointer items-center rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-50"
+            className="inline-flex cursor-pointer items-center justify-center rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-50"
           >
             ファイルを選択
           </label>
-          <span className="text-sm text-zinc-600">
+          <span className="min-w-0 break-all text-sm text-zinc-600">
             {file ? file.name : "選択されていません"}
           </span>
         </div>
@@ -83,7 +83,7 @@ export function SkillSheetUploadForm() {
       <button
         type="submit"
         disabled={loading}
-        className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
+        className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60 sm:w-auto"
       >
         {loading ? "読み取り中..." : "読み取り実行"}
       </button>

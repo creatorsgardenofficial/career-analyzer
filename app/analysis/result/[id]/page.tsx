@@ -35,15 +35,21 @@ export default async function AnalysisResultPage({ params }: PageProps) {
   return (
     <>
       <Header userName={user.name} />
-      <main id="analysis-result-pdf" className="mx-auto max-w-6xl px-4 py-8">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <main
+        id="analysis-result-pdf"
+        className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8"
+      >
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold">個人分析結果</h1>
-            <p className="mt-2 text-zinc-600">
+            <h1 className="text-2xl font-bold sm:text-3xl">個人分析結果</h1>
+            <p className="mt-2 text-sm leading-7 text-zinc-600 sm:text-base">
               回答傾向をもとに、自己理解の材料として整理しています。
             </p>
           </div>
-          <div className="flex gap-2" data-html2canvas-ignore="true">
+          <div
+            className="grid gap-2 sm:flex sm:flex-wrap"
+            data-html2canvas-ignore="true"
+          >
             <CopyButton text={displayComment} label="コメントをコピー" />
             <Link
               href="/analysis?restart=1"
@@ -78,8 +84,8 @@ export default async function AnalysisResultPage({ params }: PageProps) {
           </InfoCard>
         </div>
 
-        <div className="mt-8 rounded-lg border border-zinc-200 bg-white p-6">
-          <h2 className="mb-4 text-xl font-semibold">AI分析コメント</h2>
+        <div className="mt-8 rounded-lg border border-zinc-200 bg-white p-4 sm:p-6">
+          <h2 className="mb-4 text-lg font-semibold sm:text-xl">AI分析コメント</h2>
           <StructuredResultView sections={commentSections} />
         </div>
       </main>
@@ -104,7 +110,7 @@ function InfoCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-6">
+    <div className="rounded-lg border border-zinc-200 bg-white p-4 sm:p-6">
       <h2 className="mb-3 font-semibold">{title}</h2>
       {children}
     </div>

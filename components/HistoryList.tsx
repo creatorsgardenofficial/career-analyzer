@@ -30,8 +30,30 @@ export function HistoryList({ items }: HistoryListProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
-      <table className="min-w-full text-sm">
+    <>
+      <div className="space-y-3 md:hidden">
+        {items.map((item) => (
+          <Link
+            key={`${item.type}-${item.id}`}
+            href={item.href}
+            className="block rounded-lg border border-zinc-200 bg-white p-4 shadow-sm"
+          >
+            <div className="mb-2 flex items-start justify-between gap-3">
+              <span className="rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
+                {TYPE_LABELS[item.type]}
+              </span>
+              <span className="text-xs text-zinc-500">
+                {formatDateTime(item.createdAt)}
+              </span>
+            </div>
+            <p className="break-words font-medium text-zinc-900">{item.title}</p>
+            <p className="mt-3 text-sm text-blue-600">詳細を見る</p>
+          </Link>
+        ))}
+      </div>
+
+      <div className="hidden overflow-hidden rounded-lg border border-zinc-200 bg-white md:block">
+        <table className="min-w-full text-sm">
         <thead className="bg-zinc-50 text-left">
           <tr>
             <th className="px-4 py-3 font-medium">種別</th>
@@ -56,7 +78,8 @@ export function HistoryList({ items }: HistoryListProps) {
             </tr>
           ))}
         </tbody>
-      </table>
-    </div>
+        </table>
+      </div>
+    </>
   );
 }

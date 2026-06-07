@@ -18,7 +18,7 @@ export function FutureAnalysisForm() {
   return (
     <form
       action={formAction}
-      className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6"
+      className="space-y-4 rounded-lg border border-zinc-200 bg-white p-4 sm:p-6"
     >
       <Field label="なりたいエンジニア像 *" name="targetEngineerType" required />
       <Field label="興味のある技術" name="interestedTechnologies" />

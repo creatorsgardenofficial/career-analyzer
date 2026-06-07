@@ -32,8 +32,8 @@ export default async function DashboardPage() {
   return (
     <>
       <Header userName={user.name} />
-      <main className="mx-auto max-w-6xl px-4 py-8">
-        <h1 className="mb-2 text-3xl font-bold">ダッシュボード</h1>
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+        <h1 className="mb-2 text-2xl font-bold sm:text-3xl">ダッシュボード</h1>
         <p className="mb-8 text-zinc-600">{user.name} さん、ようこそ</p>
 
         <div className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -155,8 +155,8 @@ function SummaryCard({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-5">
-      <div className="mb-3 flex items-center justify-between">
+    <div className="rounded-lg border border-zinc-200 bg-white p-4 sm:p-5">
+      <div className="mb-3 flex items-start justify-between gap-3">
         <h2 className="font-semibold">{title}</h2>
         <Link href={link} className="text-sm text-blue-600 hover:underline">
           詳細

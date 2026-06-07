@@ -97,7 +97,7 @@ export function SkillSheetEditor({
       <input type="hidden" name="id" value={id} />
       <input type="hidden" name="structuredDataJson" value={JSON.stringify(data)} />
 
-      <section className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6">
+      <section className="space-y-4 rounded-lg border border-zinc-200 bg-white p-4 sm:p-6">
         <h2 className="font-semibold">基本情報</h2>
         <div className="grid gap-4 md:grid-cols-2">
           <TextField
@@ -141,7 +141,7 @@ export function SkillSheetEditor({
         </div>
       </section>
 
-      <section className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6">
+      <section className="space-y-4 rounded-lg border border-zinc-200 bg-white p-4 sm:p-6">
         <h2 className="font-semibold">技術スキル</h2>
         <TextField
           label="使用言語（カンマ区切り）"
@@ -189,7 +189,7 @@ export function SkillSheetEditor({
         />
       </section>
 
-      <section className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6">
+      <section className="space-y-4 rounded-lg border border-zinc-200 bg-white p-4 sm:p-6">
         <h2 className="font-semibold">得意・苦手・キーワード</h2>
         <TextField
           label="得意業務（カンマ区切り）"
@@ -222,8 +222,8 @@ export function SkillSheetEditor({
         />
       </section>
 
-      <section className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6">
-        <div className="flex items-center justify-between">
+      <section className="space-y-4 rounded-lg border border-zinc-200 bg-white p-4 sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-semibold">プロジェクト履歴</h2>
           <button
             type="button"
@@ -237,9 +237,9 @@ export function SkillSheetEditor({
         {(data.projects ?? []).map((project, index) => (
           <div
             key={index}
-            className="space-y-3 rounded-md border border-zinc-100 bg-zinc-50 p-4"
+            className="space-y-3 rounded-md border border-zinc-100 bg-zinc-50 p-3 sm:p-4"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
               <p className="font-medium">プロジェクト {index + 1}</p>
               <button
                 type="button"

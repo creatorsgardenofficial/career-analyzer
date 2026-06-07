@@ -34,11 +34,11 @@ export default async function ProjectPreparationResultPage({
   return (
     <>
       <Header userName={user.name} />
-      <main className="mx-auto max-w-4xl px-4 py-8">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold">案件対策結果</h1>
-            <p className="mt-2 text-zinc-600">
+            <h1 className="text-2xl font-bold sm:text-3xl">案件対策結果</h1>
+            <p className="mt-2 break-words text-sm leading-7 text-zinc-600 sm:text-base">
               {record.projectName ?? record.title}
             </p>
             {record.interviewDate && (
@@ -47,7 +47,7 @@ export default async function ProjectPreparationResultPage({
               </p>
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="grid gap-2 sm:flex">
             <CopyButton text={record.fullResultText} />
             <PdfExportButton
               title="案件対策結果"
@@ -63,9 +63,9 @@ export default async function ProjectPreparationResultPage({
         )}
 
         <div className="space-y-6">
-          <section className="rounded-lg border border-zinc-200 bg-white p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-semibold">自己紹介文</h2>
+          <section className="rounded-lg border border-zinc-200 bg-white p-4 sm:p-6">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <h2 className="text-lg font-semibold sm:text-xl">自己紹介文</h2>
               <CopyButton
                 text={`30秒版:\n${selfIntroduction.short}\n\n60秒版:\n${selfIntroduction.standard}`}
                 label="コピー"
@@ -83,15 +83,15 @@ export default async function ProjectPreparationResultPage({
             </div>
           </section>
 
-          <section className="rounded-lg border border-zinc-200 bg-white p-6">
-            <h2 className="mb-4 text-xl font-semibold">
+          <section className="rounded-lg border border-zinc-200 bg-white p-4 sm:p-6">
+            <h2 className="mb-4 text-lg font-semibold sm:text-xl">
               想定質問10件と回答例
             </h2>
             <div className="space-y-4">
               {questions.map((item, index) => (
                 <div
                   key={index}
-                  className="rounded-lg border border-zinc-100 bg-zinc-50 p-4"
+                  className="rounded-lg border border-zinc-100 bg-zinc-50 p-3 sm:p-4"
                 >
                   <p className="mb-3 font-medium">
                     {index + 1}. {item.question}
@@ -116,13 +116,13 @@ export default async function ProjectPreparationResultPage({
             </div>
           </section>
 
-          <section className="rounded-lg border border-zinc-200 bg-white p-6">
-            <h2 className="mb-4 text-xl font-semibold">逆質問5件</h2>
+          <section className="rounded-lg border border-zinc-200 bg-white p-4 sm:p-6">
+            <h2 className="mb-4 text-lg font-semibold sm:text-xl">逆質問5件</h2>
             <div className="space-y-4">
               {reverseQuestions.map((item, index) => (
                 <div
                   key={index}
-                  className="rounded-lg border border-zinc-100 bg-zinc-50 p-4"
+                  className="rounded-lg border border-zinc-100 bg-zinc-50 p-3 sm:p-4"
                 >
                   <p className="font-medium">
                     {index + 1}. {item.question}
@@ -144,7 +144,7 @@ export default async function ProjectPreparationResultPage({
 
 function IntroCard({ title, text }: { title: string; text: string }) {
   return (
-    <div className="rounded-lg border border-zinc-100 bg-zinc-50 p-4">
+    <div className="rounded-lg border border-zinc-100 bg-zinc-50 p-3 sm:p-4">
       <h3 className="mb-2 text-sm font-semibold text-blue-700">{title}</h3>
       <p className="whitespace-pre-wrap text-sm leading-7">{text}</p>
     </div>

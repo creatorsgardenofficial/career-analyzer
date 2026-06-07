@@ -143,8 +143,8 @@ export function AnalysisForm({ questions }: AnalysisFormProps) {
     <form action={formAction} className="space-y-6">
       <input type="hidden" name="answers" value={JSON.stringify(answers)} />
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <div className="mb-4 flex items-center justify-between text-sm text-zinc-600">
+      <div className="rounded-lg border border-zinc-200 bg-white p-4 sm:p-6">
+        <div className="mb-4 flex flex-col gap-1 text-sm text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
           <span>
             質問 {currentIndex + 1} / {questions.length}
           </span>
@@ -159,13 +159,15 @@ export function AnalysisForm({ questions }: AnalysisFormProps) {
         </div>
 
         <p className="mb-2 text-xs text-blue-700">{currentQuestion.categoryLabel}</p>
-        <h2 className="mb-6 text-lg font-semibold">{currentQuestion.text}</h2>
+        <h2 className="mb-6 text-base font-semibold leading-7 sm:text-lg">
+          {currentQuestion.text}
+        </h2>
 
         <div className="space-y-3">
           {LIKERT_OPTIONS.map((option) => (
             <label
               key={option.value}
-              className={`flex cursor-pointer items-center gap-3 rounded-md border px-4 py-3 ${
+              className={`flex cursor-pointer items-start gap-3 rounded-md border px-3 py-3 sm:items-center sm:px-4 ${
                 answers[currentQuestion.id] === option.value
                   ? "border-blue-600 bg-blue-50"
                   : "border-zinc-200 hover:bg-zinc-50"
@@ -190,7 +192,7 @@ export function AnalysisForm({ questions }: AnalysisFormProps) {
         </p>
       )}
 
-      <div className="flex flex-wrap gap-3">
+      <div className="grid gap-3 sm:flex sm:flex-wrap">
         <button
           type="button"
           disabled={currentIndex === 0}

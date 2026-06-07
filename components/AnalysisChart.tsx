@@ -26,10 +26,10 @@ export function AnalysisChart({ scores }: AnalysisChartProps) {
   }));
 
   return (
-    <div className="grid gap-8 lg:grid-cols-2">
+    <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
       <div className="rounded-lg border border-zinc-200 bg-white p-4">
         <h3 className="mb-4 font-semibold">回答傾向チャート</h3>
-        <div className="h-96">
+        <div className="h-72 sm:h-96">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart data={data}>
               <PolarGrid />
@@ -54,16 +54,16 @@ export function AnalysisChart({ scores }: AnalysisChartProps) {
 
       <div className="rounded-lg border border-zinc-200 bg-white p-4">
         <h3 className="mb-4 font-semibold">カテゴリ別の回答傾向</h3>
-        <div className="h-96">
+        <div className="h-72 sm:h-96">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} layout="vertical" margin={{ left: 80 }}>
+            <BarChart data={data} layout="vertical" margin={{ left: 40 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis type="number" domain={[0, 100]} tick={false} />
               <YAxis
                 type="category"
                 dataKey="category"
-                width={120}
-                tick={{ fontSize: 11 }}
+                width={96}
+                tick={{ fontSize: 10 }}
               />
               <Bar dataKey="tendency" fill="#2563eb" radius={[0, 4, 4, 0]} />
             </BarChart>
