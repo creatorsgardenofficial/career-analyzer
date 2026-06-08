@@ -6,6 +6,7 @@ import {
   type SkillSheetActionState,
 } from "@/app/actions/skillSheet";
 import { FormButton } from "@/components/FormButton";
+import { SkillSheetAnalysis } from "@/components/SkillSheetAnalysis";
 import type { StructuredSkillSheet } from "@/lib/validations";
 
 const initialState: SkillSheetActionState = {};
@@ -96,6 +97,8 @@ export function SkillSheetEditor({
     <form action={formAction} className="space-y-8">
       <input type="hidden" name="id" value={id} />
       <input type="hidden" name="structuredDataJson" value={JSON.stringify(data)} />
+
+      <SkillSheetAnalysis data={data} />
 
       <section className="space-y-4 rounded-lg border border-zinc-200 bg-white p-4 sm:p-6">
         <h2 className="font-semibold">基本情報</h2>
